@@ -1,186 +1,141 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Components")]
-    private Rigidbody2D rb;
-    private BoxCollider2D coll;
-    private PlayerControls controls;
-
-    [Header("Layer Masks")]
-    [SerializeField] private LayerMask groundLayer;
-
     [Header("Movement")]
-    [SerializeField] private float maxSpeed = 9f;
-    [SerializeField] private float acceleration = 90f;
-    [SerializeField] private float deceleration = 60f;
-    private Vector2 moveInput;
+    public float moveSpeed = 8f;
+    public float acceleration = 12f;
+    public float deceleration = 10f;
 
-    [Header("Jump Mechanics")]
-    [SerializeField] private float jumpForce = 15f;
-    [SerializeField] private float gravityScale = 4f;
-    [SerializeField] private float fallMultiplier = 2.5f;
-    [SerializeField] private float lowJumpMultiplier = 2f;
-    [SerializeField] private float coyoteTime = 0.15f;
-    [SerializeField] private float jumpBufferTime = 0.1f;
+    [Header("Jumping")]
+    public float jumpForce = 14f;
+    public float coyoteTime = 0.15f;
+    public float jumpBufferTime = 0.15f;
+
+    [Header("Ground Check")]
+    public Transform groundCheck;
+    public float groundCheckRadius = 0.2f;
+    public LayerMask groundLayer;
+
+    [Header("Wall Check")]
+    public Transform wallCheck;
+    public float wallCheckRadius = 0.2f;
+    public LayerMask wallLayer;
+    public float wallSlideSpeed = -2f;
+    public float wallJumpForce = 14f;
+    public float wallJumpPush = 10f;
+
+    private Rigidbody2D rb;
+    private float moveInput;
+    private bool isGrounded;
+    private bool isTouchingWall;
+    private bool isWallSliding;
+
     private float coyoteCounter;
     private float jumpBufferCounter;
-    private bool isJumpHeld;
-
-    [Header("Dash Mechanics")]
-    [SerializeField] private float dashSpeed = 24f;
-    [SerializeField] private float dashTime = 0.15f;
-    [SerializeField] private float dashCooldown = 0.2f;
-    private bool canDash = true;
-    private bool isDashing;
-
-    private void Awake()
-    {   
-        controls = new PlayerControls();
-
-        controls.Player.Jump.started += ctx => OnJumpStarted();
-        controls.Player.Jump.canceled += ctx => OnJumpCanceled();
-
-        controls.Player.Dash.started += ctx => OnDashStarted();
-    }
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        coll = GetComponent<BoxCollider2D>();
-        rb.gravityScale = gravityScale;
     }
 
     void Update()
     {
-        moveInput = controls.Player.Move.ReadValue<Vector2>();
+        // Movement input
+        moveInput = Input.GetAxisRaw("Horizontal");
 
-        if (isGrounded())
-        {
+        Debug.Log(isGrounded);
+
+        // Wall check
+        isTouchingWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, wallLayer);
+
+        // Coyote time
+        if (isGrounded)
             coyoteCounter = coyoteTime;
-            canDash = true; 
-        }
         else
-        {
             coyoteCounter -= Time.deltaTime;
-        }
 
-        if (jumpBufferCounter > 0f)
-        {
+        // Jump buffering
+        if (Input.GetButtonDown("Jump"))
+            jumpBufferCounter = jumpBufferTime;
+        else
             jumpBufferCounter -= Time.deltaTime;
+
+        // Wall slide logic
+        isWallSliding = false;
+        if (!isGrounded && isTouchingWall && moveInput != 0)
+        {
+            isWallSliding = true;
         }
 
-        if (jumpBufferCounter > 0f && coyoteCounter > 0f)
+        // Jump
+        if (jumpBufferCounter > 0)
         {
-            Jump();
+            if (coyoteCounter > 0) // normal jump
+            {
+                Jump();
+            }
+            else if (isWallSliding) // wall jump
+            {
+                WallJump();
+            }
         }
+            if (rb.linearVelocity.y <= 0.01f)
+    {
+        isGrounded = Physics2D.BoxCast(groundCheck.position, new Vector2(0.45f, 0.05f), 0f, Vector2.down, 0.02f, groundLayer).collider != null;
+    }
+    else
+    {
+        isGrounded = false;
+    }
     }
 
     void FixedUpdate()
     {
-        if (isDashing) return;
-
-        Run();
-        ModifyPhysics();
-    }
-    private void OnJumpStarted()
-    {
-        jumpBufferCounter = jumpBufferTime;
-        isJumpHeld = true;
-    }
-
-    private void OnJumpCanceled()
-    {
-        isJumpHeld = false;
-    }
-
-    private void OnDashStarted()
-    {
-        if (canDash && !isDashing)
+        // Wall slide vertical control
+        if (isWallSliding)
         {
-            StartCoroutine(PerformDash());
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, wallSlideSpeed);
+            return; // stop normal movement while sliding
         }
-    }
 
-    private void Run()
-    {
-        float targetSpeed = moveInput.x * maxSpeed;
-        float speedDif = targetSpeed - rb.linearVelocity.x;
+        // Smooth movement
+        float targetSpeed = moveInput * moveSpeed;
+        float speedDiff = targetSpeed - rb.linearVelocity.x;
 
         float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;
-        float movement = speedDif * accelRate;
 
-        rb.AddForce(movement * Vector2.right, ForceMode2D.Force);
+        float movement = speedDiff * accelRate;
+
+        rb.AddForce(new Vector2(movement, 0));
     }
 
-    private void ModifyPhysics()
+    void Jump()
     {
-
-        if (rb.linearVelocity.y < 0)
-        {
-            rb.gravityScale = gravityScale * fallMultiplier;
-        }
-        else if (rb.linearVelocity.y > 0 && !isJumpHeld)
-        {
-            rb.gravityScale = gravityScale * lowJumpMultiplier;
-        }
-        else
-        {
-            rb.gravityScale = gravityScale;
-        }
-    }
-
-    private bool isGrounded;
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-       if (collision.gameObject.CompareTag("Ground"))
-      {
-          isGrounded = true;
-      }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-     if (collision.gameObject.CompareTag("Ground"))
-      {
-         isGrounded = false;
-      }
-    }
-
-    private void Jump()
-    {
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f); 
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+    
         jumpBufferCounter = 0f;
-        coyoteCounter = 0f;
+        coyoteCounter = 0f; 
+        isGrounded = false; 
     }
 
-    private IEnumerator PerformDash()
+    void WallJump()
     {
-        canDash = false;
-        isDashing = true;
-        
-        float originalGravity = rb.gravityScale;
-        rb.gravityScale = 0f;
+        float pushDir = -Mathf.Sign(moveInput); 
+        rb.linearVelocity = new Vector2(pushDir * wallJumpPush, wallJumpForce);
 
-        Vector2 dashDir = moveInput.normalized;
-        if (dashDir == Vector2.zero) 
-        {
-            dashDir = new Vector2(transform.localScale.x > 0 ? 1 : -1, 0);
-        }
-
-        rb.linearVelocity = dashDir * dashSpeed;
-        yield return new WaitForSeconds(dashTime);
-
-        rb.gravityScale = originalGravity;
-        isDashing = false;
-
-        yield return new WaitForSeconds(dashCooldown);
+        jumpBufferCounter = 0f;
+        coyoteCounter = 0f; 
+        isGrounded = false;
     }
 
-    private void OnEnable() => controls.Player.Enable();
-    private void OnDisable() => controls.Player.Disable();
+
+    void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+
+        if (wallCheck != null)
+            Gizmos.DrawWireSphere(wallCheck.position, wallCheckRadius);
+    }
 }
