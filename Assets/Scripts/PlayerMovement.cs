@@ -17,6 +17,10 @@ public class PlayerMovement : MonoBehaviour
     public float jumpBufferTime = 0.10f;   
     public float maxFallSpeed = -22f;      
 
+    [Header("Bunny Hopping")]
+    public float bhopSpeedMultiplier = 1.15f; 
+    public float maxBhopSpeed = 22f;          
+
     [Header("Wall Check & Slide")]
     public float wallSlideSpeed = -1.5f; 
     public float wallJumpForceY = 16f;     
@@ -25,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask climbableWallLayer; 
 
     [Header("Climbing Settings")]
-    public KeyCode climbKey = KeyCode.Z;  
+    public KeyCode climbKey = KeyCode.C;  
     public float climbSpeed = 5f;          
 
     [Header("Dash Settings")]
@@ -40,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
     private float moveInputY;
     private bool isTouchingWall;
     private bool isWallSliding;
-    private bool isClimbing;               // Tracking variable for climbing
+    private bool isClimbing;               
     private float coyoteCounter;
     private float jumpBufferCounter;
     
@@ -51,7 +55,6 @@ public class PlayerMovement : MonoBehaviour
     private bool isDashing;
     private float originalGravity;
     private float dashResetTimestamp;
-
     private float wallJumpTimer;
 
     private bool isGrounded() => _isGroundedNow;
@@ -62,8 +65,21 @@ public class PlayerMovement : MonoBehaviour
         originalGravity = rb.gravityScale; 
     }
 
-        void Update()
+    void Update()
     {
+        if (Input.GetButtonDown("Jump"))
+            jumpBufferCounter = jumpBufferTime;
+        else
+            jumpBufferCounter -= Time.deltaTime;
+
+        if (isDashing && jumpBufferCounter > 0 && isGrounded() && coyoteCounter > 0)
+        {
+            StopAllCoroutines(); 
+            rb.gravityScale = originalGravity; 
+            isDashing = false;
+            Jump();
+        }
+
         if (isDashing) return;
 
         moveInputX = Input.GetAxisRaw("Horizontal");
@@ -90,22 +106,14 @@ public class PlayerMovement : MonoBehaviour
             coyoteCounter -= Time.deltaTime;
         }
 
-        if (Input.GetButtonDown("Jump"))
-            jumpBufferCounter = jumpBufferTime;
-        else
-            jumpBufferCounter -= Time.deltaTime;
-
         if (Input.GetButtonUp("Jump") && rb.linearVelocity.y > 0)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * jumpCutMultiplier);
             coyoteCounter = 0f;
         }
-
-        // ✅ FIXED CLIMBING CRITERIA: Grounded state removed! You can grab from mid-air or straight off the ground.
-        // It now tracks strictly whether you are touching a valid wall and holding down your climb key.
+ 
         isClimbing = isTouchingWall && Input.GetKey(climbKey);
 
-        // ✅ FIXED WALL SLIDING CRITERIA: Only slides passively if you are NOT actively climbing and you are falling.
         isWallSliding = false;
         if (!isGrounded() && isTouchingWall && !isClimbing && moveInputX != 0 && rb.linearVelocity.y < 0)
         {
@@ -134,17 +142,13 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isDashing) return;
 
-        // ✅ Handle Active Climbing State
         if (isClimbing)
         {
-            rb.gravityScale = 0f; // Freeze gravity completely
-            
-            // Overwrite both X and Y forces entirely so regular movement inputs can't shake you loose
+            rb.gravityScale = 0f; 
             rb.linearVelocity = new Vector2(0f, moveInputY * climbSpeed);
             return;
         }
 
-        // Restore normal gravity when not climbing
         rb.gravityScale = originalGravity;
 
         if (rb.linearVelocity.y < maxFallSpeed)
@@ -152,7 +156,6 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, maxFallSpeed);
         }
 
-        // Handle Wall Sliding State
         if (isWallSliding)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, wallSlideSpeed);
@@ -171,30 +174,52 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? airAcceleration : airDeceleration;
+            if (Mathf.Abs(rb.linearVelocity.x) > moveSpeed && Mathf.Sign(rb.linearVelocity.x) == Mathf.Sign(moveInputX))
+            {
+                accelRate = 0.1f; 
+            }
+            else
+            {
+                accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? airAcceleration : airDeceleration;
+            }
         }
 
         float movement = speedDiff * accelRate;
         rb.AddForce(new Vector2(movement, 0));
     }
 
+void Jump()
+{
+    float currentHorizontalSpeed = rb.linearVelocity.x;
 
-    void Jump()
+    if (isDashing && isGrounded())
     {
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        jumpBufferCounter = 0f;
-        coyoteCounter = 0f; 
+        float flatSpeedBoost = moveSpeed + 7f; 
+        currentHorizontalSpeed = Mathf.Sign(rb.linearVelocity.x) * flatSpeedBoost;
     }
+    else if (isGrounded() && jumpBufferCounter > 0)
+    {
+        if (moveInputX != 0 && Mathf.Abs(currentHorizontalSpeed) > 0.1f)
+        {
+            currentHorizontalSpeed *= bhopSpeedMultiplier;
+            currentHorizontalSpeed = Mathf.Clamp(currentHorizontalSpeed, -maxBhopSpeed, maxBhopSpeed);
+        }
+    }
+
+    rb.linearVelocity = new Vector2(currentHorizontalSpeed, jumpForce);
+
+    _isGroundedNow = false; 
+    coyoteCounter = 0f; 
+    jumpBufferCounter = 0f; 
+}
+
 
     void WallJump()
     {
-        // Kick away from the direction player is currently pressing
         float pushDir = -Mathf.Sign(moveInputX); 
         
-        // If climbing and not holding a directional key, push away from the wall's normal directly
         if (moveInputX == 0)
         {
-            // Simple check: wall normal points opposite to character scale orientation
             pushDir = transform.localScale.x > 0 ? -1f : 1f;
         }
 
