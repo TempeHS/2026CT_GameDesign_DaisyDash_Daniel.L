@@ -8,18 +8,22 @@ public class TimerManager : MonoBehaviour
 
     private float elapsedTime;
     private bool timerRunning;
+    private bool timerLocked; 
 
     void Start()
     {
         elapsedTime = 0f;
+        timerRunning = false;
+        timerLocked = false;
         UpdateTimerText();
     }
 
     void Update()
     {
+        if (timerLocked) return; // hard stop after timer is locked
+
         if (!timerRunning)
         {
-            // Checks for movement keys or the shift key to kickstart the run automatically
             if (Input.GetAxisRaw("Horizontal") != 0 || 
                 Input.GetAxisRaw("Vertical") != 0 || 
                 Input.GetButtonDown("Jump") ||
@@ -46,11 +50,16 @@ public class TimerManager : MonoBehaviour
         timerText.text = string.Format("{0:00}:{1:00}.{2:00}", minutes, seconds, milliseconds);
     }
 
-    public void StopTimer() => timerRunning = false;
+    public void StopTimer()
+    {
+        timerRunning = false;
+        timerLocked = true; // lock timer from restarting
+    }
 
     public void ResetTimer()
     {
         timerRunning = false;
+        timerLocked = false; // allow start again
         elapsedTime = 0f;
         UpdateTimerText();
     }
