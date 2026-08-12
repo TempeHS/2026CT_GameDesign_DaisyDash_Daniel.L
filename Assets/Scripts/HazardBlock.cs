@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class HazardBlock : MonoBehaviour
 {
@@ -7,7 +6,7 @@ public class HazardBlock : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            ResetLevel();
+            RespawnPlayer(other.gameObject);
         }
     }
 
@@ -15,19 +14,24 @@ public class HazardBlock : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            ResetLevel();
+            RespawnPlayer(collision.gameObject);
         }
     }
 
-    private void ResetLevel()
+    private void RespawnPlayer(GameObject player)
     {
+        // Reset timer if you want
         TimerManager timer = Object.FindFirstObjectByType<TimerManager>();
         if (timer != null)
         {
             timer.ResetTimer();
         }
 
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex);
+        // Respawn at last checkpoint
+        RespawnManager respawn = player.GetComponent<RespawnManager>();
+        if (respawn != null)
+        {
+            respawn.Respawn();
+        }
     }
 }

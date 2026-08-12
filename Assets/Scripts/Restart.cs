@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HoldToRestartBar : MonoBehaviour
@@ -9,12 +8,18 @@ public class HoldToRestartBar : MonoBehaviour
     [SerializeField] private float holdDuration = 3f;
 
     [Header("UI")]
-    [SerializeField] private Image restartFillBar; // Assign in Inspector
+    [SerializeField] private Image restartFillBar;
 
     private float holdTime;
+    private RespawnManager respawnManager;
 
     void Awake()
     {
+        // Find player’s RespawnManager
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+            respawnManager = player.GetComponent<RespawnManager>();
+
         if (restartFillBar != null)
         {
             restartFillBar.type = Image.Type.Filled;
@@ -32,11 +37,11 @@ public class HoldToRestartBar : MonoBehaviour
     {
         if (Input.GetKey(restartKey))
         {
-            holdTime += Time.unscaledDeltaTime; // works even if timeScale == 0
+            holdTime += Time.unscaledDeltaTime;
             UpdateBar();
 
             if (holdTime >= holdDuration)
-                RestartLevel();
+                RestartToCheckpoint();
         }
         else
         {
@@ -51,9 +56,17 @@ public class HoldToRestartBar : MonoBehaviour
         restartFillBar.fillAmount = Mathf.Clamp01(holdTime / holdDuration);
     }
 
-    private void RestartLevel()
+    private void RestartToCheckpoint()
     {
-        Scene current = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(current.buildIndex);
+        // Reset timer if you want
+        TimerManager timer = Object.FindFirstObjectByType<TimerManager>();
+        if (timer != null)
+            timer.ResetTimer();
+
+        // Respawn at checkpoint
+        if (respawnManager != null)
+            respawnManager.Respawn();
+        else
+            Debug.LogWarning("No RespawnManager found on Player.");
     }
 }
