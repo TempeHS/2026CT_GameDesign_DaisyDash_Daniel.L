@@ -25,7 +25,6 @@ public class SmoothRotateToMouse : MonoBehaviour
 
     private Light2D light2D;
 
-    // 🔥 Start OFF
     private bool userLightOn = false;
     private bool flickerOn = false;
 
@@ -37,7 +36,6 @@ public class SmoothRotateToMouse : MonoBehaviour
         if (cam == null) cam = Camera.main;
         light2D = GetComponent<Light2D>();
 
-        // 🔥 Force everything OFF at start
         light2D.enabled = false;
 
         if (flashlightParticles != null)
