@@ -15,7 +15,6 @@ public class HoldToRestartBar : MonoBehaviour
 
     void Awake()
     {
-        // Find player’s RespawnManager
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
             respawnManager = player.GetComponent<RespawnManager>();
@@ -58,7 +57,6 @@ public class HoldToRestartBar : MonoBehaviour
 
     private void RestartToCheckpoint()
     {
-        // Reset timer if you want
         TimerManager timer = Object.FindFirstObjectByType<TimerManager>();
         if (timer != null)
             timer.ResetTimer();
@@ -67,6 +65,6 @@ public class HoldToRestartBar : MonoBehaviour
         if (respawnManager != null)
             respawnManager.Respawn();
         else
-            Debug.LogWarning("No RespawnManager found on Player.");
+            Debug.LogWarning("No RespawnManager found.");
     }
 }

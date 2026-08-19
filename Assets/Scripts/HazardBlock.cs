@@ -20,7 +20,6 @@ public class HazardBlock : MonoBehaviour
 
     private void RespawnPlayer(GameObject player)
     {
-        // Reset timer if you want
         TimerManager timer = Object.FindFirstObjectByType<TimerManager>();
         if (timer != null)
         {
