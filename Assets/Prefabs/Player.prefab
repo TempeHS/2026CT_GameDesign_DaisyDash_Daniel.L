@@ -100,14 +100,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 0}
   player: {fileID: 8125970146030289027}
+  flashlightParticles: {fileID: 1685870296689599197}
   followDistance: 0.5
   rotationSpeed: 1080
   angleOffset: -90
   toggleMouseButton: 0
-  flashlightParticles: {fileID: 1685870296689599197}
   enableFlicker: 1
   flickerChance: 0.01
-  longBlackoutChance: 0.005
+  blackoutChance: 0.02
   flickerOffTime: {x: 0.03, y: 0.1}
   blackoutOffTime: {x: 0.4, y: 1.2}
   flickerInterval: {x: 0.05, y: 0.2}

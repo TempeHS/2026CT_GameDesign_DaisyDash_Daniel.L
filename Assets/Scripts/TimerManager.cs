@@ -20,7 +20,7 @@ public class TimerManager : MonoBehaviour
 
     void Update()
     {
-        if (timerLocked) return; // hard stop after timer is locked
+        if (timerLocked) return;
 
         if (!timerRunning)
         {
@@ -53,13 +53,13 @@ public class TimerManager : MonoBehaviour
     public void StopTimer()
     {
         timerRunning = false;
-        timerLocked = true; // lock timer from restarting
+        timerLocked = true;
     }
 
     public void ResetTimer()
     {
         timerRunning = false;
-        timerLocked = false; // allow start again
+        timerLocked = false;
         elapsedTime = 0f;
         UpdateTimerText();
     }

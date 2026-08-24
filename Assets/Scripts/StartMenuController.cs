@@ -3,16 +3,19 @@ using UnityEngine.SceneManagement;
 
 public class StartMenuController : MonoBehaviour
 {
+    private const string LevelOneSceneName = "Level1";
+
     public void OnStartClick()
     {
-        SceneManager.LoadScene("Start");
+        SceneManager.LoadScene(LevelOneSceneName);
     }
 
     public void OnExitClick()
     {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-#endif
+#else
         Application.Quit();
+#endif
     }
 }
