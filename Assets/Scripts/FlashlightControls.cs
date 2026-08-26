@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 [RequireComponent(typeof(Light2D))]
-public class SmoothRotateToMouse : MonoBehaviour
+public class FlashlightControls : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Camera cam;
@@ -30,6 +30,12 @@ public class SmoothRotateToMouse : MonoBehaviour
 
     private float nextFlickerCheck;
     private float flickerOffUntil;
+
+    public bool IsLightEmitting => light2D != null && light2D.enabled;
+    public Vector2 BeamOrigin => transform.position;
+    public Vector2 BeamDirection => transform.up;
+
+    public Light2D Light => light2D;
 
     void Awake()
     {
@@ -111,10 +117,11 @@ public class SmoothRotateToMouse : MonoBehaviour
 
     public void TurnOffFlashlight()
     {
-       userLightOn = false;
-       flickerOn = false;
-      SetFlashlightState(false);
+        userLightOn = false;
+        flickerOn = false;
+        SetFlashlightState(false);
     }
+
     private void RotateToMouse()
     {
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);

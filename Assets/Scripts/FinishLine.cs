@@ -20,7 +20,7 @@ public class FinishLine : MonoBehaviour
             }
             else
             {
-                Debug.Log("Reached final level — no more scenes to load.");
+                Debug.Log("Reached final level - no more scenes to load.");
             }
         }
     }

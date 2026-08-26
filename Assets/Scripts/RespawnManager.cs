@@ -19,7 +19,7 @@ public class RespawnManager : MonoBehaviour
     public void Respawn()
     {
         transform.position = respawnPoint;
-        GetComponentInChildren<SmoothRotateToMouse>().TurnOffFlashlight();
+        GetComponentInChildren<FlashlightControls>().TurnOffFlashlight();
 
 
         if (rb != null)

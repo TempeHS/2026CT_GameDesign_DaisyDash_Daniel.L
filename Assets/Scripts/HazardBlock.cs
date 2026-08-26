@@ -20,13 +20,6 @@ public class HazardBlock : MonoBehaviour
 
     private void RespawnPlayer(GameObject player)
     {
-        TimerManager timer = Object.FindFirstObjectByType<TimerManager>();
-        if (timer != null)
-        {
-            timer.ResetTimer();
-        }
-
-        // Respawn at last checkpoint
         RespawnManager respawn = player.GetComponent<RespawnManager>();
         if (respawn != null)
         {
