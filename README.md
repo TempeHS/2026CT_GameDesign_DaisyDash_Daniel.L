@@ -2,13 +2,13 @@
 
 | Field | Detail |
 |---|---|
-| **Game Title** | |
-| **Student Name(s)** | |
-| **Class / Course** | |
-| **Repository** | |
-| **Unity Version** | |
-| **Document Version** | |
-| **Date** | |
+| **Game Title** | Daisy Dash |
+| **Student Name(s)** | Daniel L |
+| **Class / Course** | Computer Technology |
+| **Repository** | https://github.com/TempeHS/2026CT_GameDesign_DaisyDash_Daniel.L |
+| **Unity Version** | 6000.0.58f1 |
+| **Document Version** | 0.1 |
+| **Date** | 27/08/2026 |
 
 ---
 
