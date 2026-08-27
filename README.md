@@ -7,7 +7,7 @@
 | **Class / Course** | Computer Technology |
 | **Repository** | https://github.com/TempeHS/2026CT_GameDesign_DaisyDash_Daniel.L |
 | **Unity Version** | 6000.0.58f1 |
-| **Document Version** | v0.1 |
+| **Document Version** | 0.1 |
 | **Date** | 27/08/2026 |
 
 ---
@@ -48,9 +48,9 @@
 ### 1.5 Platform & Build Settings
 | Setting | Detail |
 |---|---|
-| Target Platform | |
-| Resolution | |
-| Build Type | |
+| Target Platform | Windows x64 |
+| Resolution | 1980x1080 |
+| Build Type | Development |
 
 ---
 
@@ -69,7 +69,7 @@
 
 | Field | Detail |
 |---|---|
-| **Video Title** | |
+| **Video Title** | Daisy Dash: Feature Walkthrough |
 | **Link / Embed** | |
 | **Duration** | |
 | **Description** | |
@@ -285,12 +285,17 @@
 
 ### 8.1 Script Summary
 | Script Name | Attached To | Responsibility |
-|---|---|---|
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
+| --- | --- | --- |
+| **Checkpoint.cs** | Checkpoints | Stores & updates player respawn position when touched. |
+| **FinishLine.cs** | Finish line | Detects level completion; stops timer and triggers next scene. |
+| **FlashlightControls.cs** | Flashlight | Rotates flashlight toward mouse, keeps flashlight on player, handles on/off toggle. |
+| **FlashlightReveal.cs** | Hidden blocks | Shows/hides hidden blocks when shone by flashlight. |
+| **HazardBlock.cs** | Hazard blocks | Detects player collision with hazards and triggers respawn. |
+| **PlayerMovement.cs** | Player | Handles player input, movement, jumping and physics. |
+| **RespawnManager.cs** | Player | Tracks current checkpoint and respawns player there after death or hazard collision. |
+| **Restart.cs** | Not functional | Intended to restart level; currently does not work. |
+| **StartMenuController.cs** | Start menu controller object | Controls start menu UI, button actions play/quit, and scene transitions. |
+| **TimerManager.cs** | Timer object | Tracks and displays time passed; used for level timing and stops when reaching end. |
 
 ### 8.2 Key Algorithms / Logic
 | Feature | Script | Description |
