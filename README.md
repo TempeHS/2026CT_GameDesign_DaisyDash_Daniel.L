@@ -31,7 +31,7 @@
 ## 1. Game Overview
 
 ### 1.1 Genre
-
+2d platformer
 
 ### 1.2 Target Audience
 
