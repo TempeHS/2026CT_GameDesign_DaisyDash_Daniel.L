@@ -31,19 +31,19 @@
 ## 1. Game Overview
 
 ### 1.1 Genre
-2d platformer
+2D platformer
 
 ### 1.2 Target Audience
-
+Players who enjoy fast-paced, challenging platform games, including students and casual gamers who like mastering movement, hazards, and timed level runs.
 
 ### 1.3 Game Summary
-
+Daisy Dash is a 2D platformer in which the player navigates platforming levels using running, jumping, wall jumping, climbing, and dashing. A mouse-controlled flashlight reveals hidden blocks and routes, while checkpoints provide progress through the level. Players must avoid hazard blocks and reach the finish line as quickly as possible.
 
 ### 1.4 Win / Loss Conditions
 | Condition | Description |
 |---|---|
-| Win | |
-| Loss | |
+| Win | Reach the finish line. The level timer stops and the game loads the next level when one is available. |
+| Loss | Touch a hazard or otherwise fail a platforming section. The player respawns at the most recently activated checkpoint and can continue the run. |
 
 ### 1.5 Platform & Build Settings
 | Setting | Detail |
