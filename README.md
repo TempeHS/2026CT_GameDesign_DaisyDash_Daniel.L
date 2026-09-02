@@ -48,9 +48,9 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 ### 1.5 Platform & Build Settings
 | Setting | Detail |
 |---|---|
-| Target Platform | Windows x64 |
+| Target Platform | Pc |
 | Resolution | 1980x1080 |
-| Build Type | Development |
+| Build Type | Windows x64 |
 
 ---
 
@@ -98,10 +98,10 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 ### 3.2 Player Controls
 | Action | Input (Keyboard / Controller) | Description |
 |---|---|---|
-| | | |
-| | | |
-| | | |
-| | | |
+| Walk | A & D | Left and right movement |
+| Jump | Space | Allows player to jump |
+| Dash | Shift | Gives player a quick speed boost |
+| Climbing | C | Allows player to climb walls |
 
 ### 3.3 Physics & Collision
 | Feature | Description |
@@ -398,15 +398,15 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 ---
 
-### Branch 2 — `feature/`
+### Branch 2 — `feature/camera`
 
 | Field | Detail |
 |---|---|
-| **Branch Name** | |
-| **Feature Developed** | |
-| **Merged Into** | |
-| **Date Started** | |
-| **Date Merged** | |
+| **Branch Name** | Camera |
+| **Feature Developed** | Camera |
+| **Merged Into** | Main |
+| **Date Started** | 2026-06-18 |
+| **Date Merged** | 2026-06-25 |
 
 #### What Was Built
 <!-- Describe what this branch added or changed -->
@@ -430,7 +430,7 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 ---
 
-### Branch 3 — `feature/`
+### Branch 3 — `feature/levels`
 
 | Field | Detail |
 |---|---|
@@ -461,7 +461,7 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 ---
 
-### Branch 4 — `feature/`
+### Branch 4 — `feature/animations`
 
 | Field | Detail |
 |---|---|
@@ -492,7 +492,7 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 ---
 
-### Branch 5 — `feature/`
+### Branch 5 — `feature/lighting`
 
 | Field | Detail |
 |---|---|
@@ -523,7 +523,7 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 ---
 
-### Branch 6 — `feature/`
+### Branch 6 — `feature/movement`
 
 | Field | Detail |
 |---|---|
