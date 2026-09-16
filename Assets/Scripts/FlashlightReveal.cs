@@ -16,15 +16,15 @@ public class FlashlightReveal : MonoBehaviour
     [SerializeField] private bool toggleCollision = true;
     [SerializeField] private bool includeChildColliders = true;
 
-    private Renderer rend;
-    private Collider2D targetCollider;
+    private Renderer[] targetRenderers;
     private Collider2D[] colliders2D;
     private bool isRevealed;
 
     void Awake()
     {
-        rend = GetComponent<Renderer>();
-        targetCollider = GetComponent<Collider2D>();
+        targetRenderers = includeChildColliders
+            ? GetComponentsInChildren<Renderer>(true)
+            : GetComponents<Renderer>();
 
         colliders2D = includeChildColliders
             ? GetComponentsInChildren<Collider2D>(true)
@@ -40,52 +40,6 @@ public class FlashlightReveal : MonoBehaviour
             SetRevealed(shouldReveal);
     }
 
-    private Vector2[] BuildLightConePolygon(Light2D light, int segments = 24)
-    {
-        float angle = light.pointLightOuterAngle;
-        float radius = light.pointLightOuterRadius;
-
-        Vector2 origin = light.transform.position;
-
-        float half = angle * 0.5f;
-
-        Vector2[] poly = new Vector2[segments + 2];
-        poly[0] = origin;
-
-        for (int i = 0; i <= segments; i++)
-        {
-            float t = i / (float)segments;
-            float a = Mathf.Lerp(-half, half, t);
-
-            Quaternion rot = Quaternion.Euler(0, 0, a);
-            Vector2 localDir = rot * Vector2.up;
-
-            Vector2 worldDir = light.transform.TransformDirection(localDir);
-
-            poly[i + 1] = origin + worldDir * radius;
-        }
-
-        return poly;
-    }
-
-    private bool PointInPolygon(Vector2 p, Vector2[] poly)
-    {
-        bool inside = false;
-
-        for (int i = 0, j = poly.Length - 1; i < poly.Length; j = i++)
-        {
-            bool intersect =
-                ((poly[i].y > p.y) != (poly[j].y > p.y)) &&
-                (p.x < (poly[j].x - poly[i].x) * (p.y - poly[i].y) /
-                (poly[j].y - poly[i].y) + poly[i].x);
-
-            if (intersect)
-                inside = !inside;
-        }
-
-        return inside;
-    }
-
     private bool CanReveal()
     {
         if (flashlight == null || !flashlight.IsLightEmitting)
@@ -94,50 +48,53 @@ public class FlashlightReveal : MonoBehaviour
         Vector2 origin = flashlight.BeamOrigin;
         Light2D light = flashlight.Light;
 
-        Vector2[] conePoly = BuildLightConePolygon(light);
-        if (conePoly == null || conePoly.Length < 3)
+        if (targetRenderers.Length == 0)
             return false;
 
-        Bounds b = targetCollider.bounds;
+        Bounds bounds = targetRenderers[0].bounds;
+        for (int i = 1; i < targetRenderers.Length; i++)
+            bounds.Encapsulate(targetRenderers[i].bounds);
 
-        Vector2[] pts = new Vector2[]
+        const int sampleSteps = 4;
+        for (int x = 0; x <= sampleSteps; x++)
         {
-            b.center,
-            new Vector2(b.min.x, b.min.y),
-            new Vector2(b.min.x, b.max.y),
-            new Vector2(b.max.x, b.min.y),
-            new Vector2(b.max.x, b.max.y),
-            new Vector2(b.center.x, b.min.y),
-            new Vector2(b.center.x, b.max.y),
-            new Vector2(b.min.x, b.center.y),
-            new Vector2(b.max.x, b.center.y)
-        };
+            float xPercent = x / (float)sampleSteps;
+            for (int y = 0; y <= sampleSteps; y++)
+            {
+                float yPercent = y / (float)sampleSteps;
+                Vector2 point = new Vector2(
+                    Mathf.Lerp(bounds.min.x, bounds.max.x, xPercent),
+                    Mathf.Lerp(bounds.min.y, bounds.max.y, yPercent));
 
-        for (int i = 0; i < pts.Length; i++)
-        {
-            Vector2 pt = pts[i];
-
-            if (!PointInPolygon(pt, conePoly))
-                continue;
-
-            float dist = Vector2.Distance(origin, pt);
-            if (dist > revealDistance)
-                continue;
-
-            Vector2 dir = (pt - origin).normalized;
-            RaycastHit2D hit = Physics2D.Raycast(origin, dir, dist, occluderMask);
-
-            if (hit.collider == null)
-                return true;
+                if (CanRevealPoint(point, origin, light))
+                    return true;
+            }
         }
 
         return false;
     }
 
+    private bool CanRevealPoint(Vector2 point, Vector2 origin, Light2D light)
+    {
+        Vector2 toPoint = point - origin;
+        float distance = toPoint.magnitude;
+
+        if (distance <= 0.001f || distance > revealDistance)
+            return false;
+
+        if (Vector2.Angle(flashlight.BeamDirection, toPoint) > light.pointLightOuterAngle * 0.5f)
+            return false;
+
+        RaycastHit2D hit = Physics2D.Raycast(origin, toPoint / distance, distance, occluderMask);
+        return hit.collider == null;
+    }
+
     private void SetRevealed(bool revealed)
     {
         isRevealed = revealed;
-        rend.enabled = revealed;
+
+        for (int i = 0; i < targetRenderers.Length; i++)
+            targetRenderers[i].enabled = revealed;
 
         if (!toggleCollision) return;
 
@@ -145,15 +102,4 @@ public class FlashlightReveal : MonoBehaviour
             colliders2D[i].enabled = revealed;
     }
 
-    void OnDrawGizmos()
-    {
-        if (flashlight == null || flashlight.Light == null) return;
-
-        Vector2[] poly = BuildLightConePolygon(flashlight.Light);
-        if (poly == null) return;
-
-        Gizmos.color = Color.yellow;
-        for (int i = 0; i < poly.Length - 1; i++)
-            Gizmos.DrawLine(poly[i], poly[i + 1]);
-    }
 }

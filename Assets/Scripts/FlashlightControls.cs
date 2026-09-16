@@ -15,21 +15,9 @@ public class FlashlightControls : MonoBehaviour
     [SerializeField] private float angleOffset = -90f;
     [SerializeField] private int toggleMouseButton = 0;
 
-    [Header("Flicker")]
-    [SerializeField] private bool enableFlicker = true;
-    [SerializeField] private float flickerChance = 0.08f;
-    [SerializeField] private float blackoutChance = 0.02f;
-    [SerializeField] private Vector2 flickerOffTime = new Vector2(0.03f, 0.1f);
-    [SerializeField] private Vector2 blackoutOffTime = new Vector2(0.4f, 1.2f);
-    [SerializeField] private Vector2 flickerInterval = new Vector2(0.05f, 0.2f);
-
     private Light2D light2D;
 
     private bool userLightOn = false;
-    private bool flickerOn = false;
-
-    private float nextFlickerCheck;
-    private float flickerOffUntil;
 
     public bool IsLightEmitting => light2D != null && light2D.enabled;
     public Vector2 BeamOrigin => transform.position;
@@ -46,8 +34,6 @@ public class FlashlightControls : MonoBehaviour
 
         if (flashlightParticles != null)
             flashlightParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-
-        ScheduleNextCheck();
     }
 
     void Update()
@@ -55,47 +41,14 @@ public class FlashlightControls : MonoBehaviour
         if (Input.GetMouseButtonDown(toggleMouseButton))
         {
             userLightOn = !userLightOn;
-            flickerOn = userLightOn;
             SetFlashlightState(userLightOn);
         }
-
-        if (userLightOn && enableFlicker)
-            UpdateFlicker();
 
         if (cam == null || player == null) return;
 
         RotateToMouse();
         FollowPlayer();
         SyncParticles();
-    }
-
-    private void UpdateFlicker()
-    {
-        if (!flickerOn && Time.time >= flickerOffUntil)
-        {
-            flickerOn = true;
-            SetFlashlightState(true);
-            ScheduleNextCheck();
-        }
-
-        if (flickerOn && Time.time >= nextFlickerCheck)
-        {
-            float roll = Random.value;
-
-            if (roll < blackoutChance)
-                TriggerOff(blackoutOffTime);
-            else if (roll < blackoutChance + flickerChance)
-                TriggerOff(flickerOffTime);
-            else
-                ScheduleNextCheck();
-        }
-    }
-
-    private void TriggerOff(Vector2 range)
-    {
-        flickerOn = false;
-        SetFlashlightState(false);
-        flickerOffUntil = Time.time + Random.Range(range.x, range.y);
     }
 
     private void SetFlashlightState(bool on)
@@ -118,7 +71,6 @@ public class FlashlightControls : MonoBehaviour
     public void TurnOffFlashlight()
     {
         userLightOn = false;
-        flickerOn = false;
         SetFlashlightState(false);
     }
 
@@ -152,8 +104,4 @@ public class FlashlightControls : MonoBehaviour
             flashlightParticles.transform.position = transform.position;
     }
 
-    private void ScheduleNextCheck()
-    {
-        nextFlickerCheck = Time.time + Random.Range(flickerInterval.x, flickerInterval.y);
-    }
 }

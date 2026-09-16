@@ -105,12 +105,6 @@ MonoBehaviour:
   rotationSpeed: 1080
   angleOffset: -90
   toggleMouseButton: 0
-  enableFlicker: 1
-  flickerChance: 0.01
-  blackoutChance: 0.02
-  flickerOffTime: {x: 0.03, y: 0.1}
-  blackoutOffTime: {x: 0.4, y: 1.2}
-  flickerInterval: {x: 0.05, y: 0.2}
 --- !u!1 &2948830140724934289
 GameObject:
   m_ObjectHideFlags: 0
@@ -5332,7 +5326,7 @@ MonoBehaviour:
   maxFallSpeed: -22
   bhopSpeedMultiplier: 1.15
   maxBhopSpeed: 22
-  wallSlideSpeed: 2
+  wallSlideSpeed: -1.5
   wallJumpForceY: 16
   wallJumpForceX: 14
   wallJumpControlTime: 0.15

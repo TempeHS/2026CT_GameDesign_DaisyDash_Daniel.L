@@ -1638,14 +1638,6 @@ PrefabInstance:
       propertyPath: cam
       value: 
       objectReference: {fileID: 437468104}
-    - target: {fileID: 8764880594887359073, guid: a061af40d42d8eb4594662538fd6559d, type: 3}
-      propertyPath: flickerChance
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8764880594887359073, guid: a061af40d42d8eb4594662538fd6559d, type: 3}
-      propertyPath: longBlackoutChance
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
