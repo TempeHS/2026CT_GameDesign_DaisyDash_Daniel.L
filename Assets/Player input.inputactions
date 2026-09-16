@@ -322,17 +322,6 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "178a8c3a-2b5b-47c9-8a20-113920a371fd",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
                     "action": "Climb",
                     "isComposite": false,
                     "isPartOfComposite": false

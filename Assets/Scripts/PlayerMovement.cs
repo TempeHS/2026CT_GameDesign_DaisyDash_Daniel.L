@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -42,14 +43,14 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private float moveInputX;
     private float moveInputY;
-    private bool isTouchingWall;
     private bool isWallSliding;
     private bool isClimbing;               
     private float coyoteCounter;
     private float jumpBufferCounter;
     
     private bool _isGroundedNow;
-    private bool _isTouchingWallNow;
+    private readonly HashSet<Collider2D> groundContacts = new HashSet<Collider2D>();
+    private readonly HashSet<Collider2D> wallContacts = new HashSet<Collider2D>();
 
     private bool canDash = true;
     private bool isDashing;
@@ -57,7 +58,9 @@ public class PlayerMovement : MonoBehaviour
     private float dashResetTimestamp;
     private float wallJumpTimer;
 
-    private bool isGrounded() => _isGroundedNow;
+    private bool IsGrounded => _isGroundedNow;
+    private bool IsTouchingWall => wallContacts.Count > 0;
+    private bool IsWallJumpLocked => wallJumpTimer > 0f;
 
     void Start()
     {
@@ -72,7 +75,7 @@ public class PlayerMovement : MonoBehaviour
         else
             jumpBufferCounter -= Time.deltaTime;
 
-        if (isDashing && jumpBufferCounter > 0 && isGrounded() && coyoteCounter > 0)
+        if (isDashing && jumpBufferCounter > 0 && IsGrounded && coyoteCounter > 0)
         {
             StopAllCoroutines(); 
             rb.gravityScale = originalGravity; 
@@ -85,14 +88,10 @@ public class PlayerMovement : MonoBehaviour
         moveInputX = Input.GetAxisRaw("Horizontal");
         moveInputY = Input.GetAxisRaw("Vertical");
         
-        isTouchingWall = _isTouchingWallNow;
+        if (IsWallJumpLocked)
+            wallJumpTimer = Mathf.Max(0f, wallJumpTimer - Time.deltaTime);
 
-        if (isWallWallJumpingLockout())
-        {
-            wallJumpTimer -= Time.deltaTime;
-        }
-
-        if (isGrounded())
+        if (IsGrounded)
         {
             coyoteCounter = coyoteTime;
 
@@ -112,30 +111,17 @@ public class PlayerMovement : MonoBehaviour
             coyoteCounter = 0f;
         }
  
-        isClimbing = isTouchingWall && Input.GetKey(climbKey);
-
-        isWallSliding = false;
-        if (!isGrounded() && isTouchingWall && !isClimbing && moveInputX != 0 && rb.linearVelocity.y < 0)
-        {
-            isWallSliding = true;
-        }
+        isClimbing = IsTouchingWall && (Input.GetKey(climbKey) || Input.GetKey(KeyCode.Z));
+        isWallSliding = !IsGrounded && IsTouchingWall && !isClimbing && moveInputX != 0 && rb.linearVelocity.y < 0;
 
         if (Input.GetKeyDown(dashKey) && canDash)
         {
             StartCoroutine(PerformDash());
         }
 
-        if (jumpBufferCounter > 0)
-        {
-            if (coyoteCounter > 0) 
-            {
-                Jump();
-            }
-            else if (isWallSliding || isClimbing) 
-            {
-                WallJump();
-            }
-        }
+        if (jumpBufferCounter <= 0) return;
+        if (coyoteCounter > 0) Jump();
+        else if (isWallSliding || isClimbing) WallJump();
     }
 
     void FixedUpdate()
@@ -162,56 +148,41 @@ public class PlayerMovement : MonoBehaviour
             return; 
         }
 
-        if (isWallWallJumpingLockout()) return;
+        if (IsWallJumpLocked) return;
 
         float targetSpeed = moveInputX * moveSpeed;
         float speedDiff = targetSpeed - rb.linearVelocity.x;
-        
-        float accelRate;
-        if (isGrounded())
-        {
-            accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? groundAcceleration : groundDeceleration;
-        }
-        else
-        {
-            if (Mathf.Abs(rb.linearVelocity.x) > moveSpeed && Mathf.Sign(rb.linearVelocity.x) == Mathf.Sign(moveInputX))
-            {
-                accelRate = 0.1f; 
-            }
-            else
-            {
-                accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? airAcceleration : airDeceleration;
-            }
-        }
 
-        float movement = speedDiff * accelRate;
-        rb.AddForce(new Vector2(movement, 0));
+        bool hasMovementInput = Mathf.Abs(targetSpeed) > 0.01f;
+        float accelRate = IsGrounded
+            ? (hasMovementInput ? groundAcceleration : groundDeceleration)
+            : (hasMovementInput ? airAcceleration : airDeceleration);
+
+        if (!IsGrounded && Mathf.Abs(rb.linearVelocity.x) > moveSpeed && Mathf.Sign(rb.linearVelocity.x) == Mathf.Sign(moveInputX))
+            accelRate = 0.1f;
+
+        rb.AddForce(new Vector2(speedDiff * accelRate, 0));
     }
 
-void Jump()
-{
-    float currentHorizontalSpeed = rb.linearVelocity.x;
-
-    if (isDashing && isGrounded())
+    void Jump()
     {
-        float flatSpeedBoost = moveSpeed + 7f; 
-        currentHorizontalSpeed = Mathf.Sign(rb.linearVelocity.x) * flatSpeedBoost;
-    }
-    else if (isGrounded() && jumpBufferCounter > 0)
-    {
-        if (moveInputX != 0 && Mathf.Abs(currentHorizontalSpeed) > 0.1f)
+        float currentHorizontalSpeed = rb.linearVelocity.x;
+
+        if (isDashing && IsGrounded)
         {
-            currentHorizontalSpeed *= bhopSpeedMultiplier;
-            currentHorizontalSpeed = Mathf.Clamp(currentHorizontalSpeed, -maxBhopSpeed, maxBhopSpeed);
+            currentHorizontalSpeed = Mathf.Sign(rb.linearVelocity.x) * (moveSpeed + 7f);
         }
+        else if (IsGrounded && jumpBufferCounter > 0 && moveInputX != 0 && Mathf.Abs(currentHorizontalSpeed) > 0.1f)
+        {
+            currentHorizontalSpeed = Mathf.Clamp(currentHorizontalSpeed * bhopSpeedMultiplier, -maxBhopSpeed, maxBhopSpeed);
+        }
+
+        rb.linearVelocity = new Vector2(currentHorizontalSpeed, jumpForce);
+
+        _isGroundedNow = false;
+        coyoteCounter = 0f;
+        jumpBufferCounter = 0f;
     }
-
-    rb.linearVelocity = new Vector2(currentHorizontalSpeed, jumpForce);
-
-    _isGroundedNow = false; 
-    coyoteCounter = 0f; 
-    jumpBufferCounter = 0f; 
-}
 
 
     void WallJump()
@@ -229,11 +200,6 @@ void Jump()
         coyoteCounter = 0f; 
 
         wallJumpTimer = wallJumpControlTime;
-    }
-
-    private bool isWallWallJumpingLockout()
-    {
-        return wallJumpTimer > 0f;
     }
 
     private IEnumerator PerformDash()
@@ -277,33 +243,51 @@ void Jump()
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        _isGroundedNow = false;
-        _isTouchingWallNow = false;
+        groundContacts.Remove(collision.collider);
+        wallContacts.Remove(collision.collider);
+        _isGroundedNow = groundContacts.Count > 0;
     }
 
     private void EvaluateCollisions(Collision2D collision)
     {
+        bool wasGrounded = IsGrounded;
+        groundContacts.Remove(collision.collider);
+        wallContacts.Remove(collision.collider);
+
+        bool hasGroundContact = false;
+        bool hasWallContact = false;
+
         for (int i = 0; i < collision.contactCount; i++)
         {
             Vector2 normal = collision.GetContact(i).normal;
 
             if (normal.y > 0.7f)
             {
-                if (!_isGroundedNow)
-                {
-                    dashResetTimestamp = Time.time + dashResetDelay;
-                }
-
-                _isGroundedNow = true;
+                hasGroundContact = true;
             }
 
             if (Mathf.Abs(normal.x) > 0.7f)
             {
                 if ((climbableWallLayer.value & (1 << collision.gameObject.layer)) != 0)
                 {
-                    _isTouchingWallNow = true;
+                    hasWallContact = true;
                 }
             }
         }
+
+        if (hasGroundContact)
+        {
+            groundContacts.Add(collision.collider);
+        }
+
+        if (hasWallContact)
+        {
+            wallContacts.Add(collision.collider);
+        }
+
+        _isGroundedNow = groundContacts.Count > 0;
+
+        if (!wasGrounded && IsGrounded)
+            dashResetTimestamp = Time.time + dashResetDelay;
     }
 }
