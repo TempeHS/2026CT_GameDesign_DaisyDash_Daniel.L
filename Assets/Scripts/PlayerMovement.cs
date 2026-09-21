@@ -40,6 +40,13 @@ public class PlayerMovement : MonoBehaviour
     public float dashResetDelay = 0.1f; 
     public KeyCode dashKey = KeyCode.LeftShift; 
 
+    [Header("VFX")]
+    [SerializeField] private ParticleSystem jumpVfx;
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource jumpAudioSource;
+    [SerializeField] private AudioClip jumpSound;
+
     private Rigidbody2D rb;
     private float moveInputX;
     private float moveInputY;
@@ -96,9 +103,7 @@ public class PlayerMovement : MonoBehaviour
             coyoteCounter = coyoteTime;
 
             if (!canDash && Time.time >= dashResetTimestamp)
-            {
                 canDash = true;
-            }
         }
         else
         {
@@ -110,14 +115,12 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * jumpCutMultiplier);
             coyoteCounter = 0f;
         }
- 
+
         isClimbing = IsTouchingWall && (Input.GetKey(climbKey) || Input.GetKey(KeyCode.Z));
         isWallSliding = !IsGrounded && IsTouchingWall && !isClimbing && moveInputX != 0 && rb.linearVelocity.y < 0;
 
         if (Input.GetKeyDown(dashKey) && canDash)
-        {
             StartCoroutine(PerformDash());
-        }
 
         if (jumpBufferCounter <= 0) return;
         if (coyoteCounter > 0) Jump();
@@ -179,6 +182,8 @@ public class PlayerMovement : MonoBehaviour
 
         rb.linearVelocity = new Vector2(currentHorizontalSpeed, jumpForce);
 
+        PlayJumpEffects();
+
         _isGroundedNow = false;
         coyoteCounter = 0f;
         jumpBufferCounter = 0f;
@@ -196,10 +201,21 @@ public class PlayerMovement : MonoBehaviour
 
         rb.linearVelocity = new Vector2(pushDir * wallJumpForceX, wallJumpForceY);
 
+        PlayJumpEffects();
+
         jumpBufferCounter = 0f;
         coyoteCounter = 0f; 
 
         wallJumpTimer = wallJumpControlTime;
+    }
+
+    private void PlayJumpEffects()
+    {
+        if (jumpVfx != null)
+            jumpVfx.Play(true);
+
+        if (jumpAudioSource != null && jumpSound != null)
+            jumpAudioSource.PlayOneShot(jumpSound);
     }
 
     private IEnumerator PerformDash()
