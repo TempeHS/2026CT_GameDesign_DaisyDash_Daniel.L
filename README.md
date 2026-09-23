@@ -34,7 +34,7 @@
 2D platformer
 
 ### 1.2 Target Audience
-Players who enjoy fast-paced, platform games, including students and casual gamers who like mastering movement, hazards, and timed level runs.
+Players who enjoy fast-paced 2D platforming, hidden routes, and movement challenges.
 
 ### 1.3 Game Summary
 Daisy Dash is a 2D platformer in which the player navigates platforming levels using running, jumping, wall sliding, wall jumping, and dashing. A mouse-controlled flashlight reveals hidden blocks and routes, while checkpoints prevent the player from being sent back to the start. Players must avoid hazard blocks and reach the finish line as quickly as possible.
@@ -42,13 +42,13 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 ### 1.4 Win / Loss Conditions
 | Condition | Description |
 |---|---|
-| Win | Reach the finish line. The level timer stops and the game loads the next level . |
-| Loss | Touch a hazard or otherwise fail a platforming section and falling into the void. The player respawns at the most recently activated checkpoint and can continue the run. |
+| Win | Reach the finish line. The timer stops and the next scene loads when another level is available. |
+| Loss | Touch a hazard or fall into the void. The player respawns at the latest checkpoint. |
 
 ### 1.5 Platform & Build Settings
 | Setting | Detail |
 |---|---|
-| Target Platform | Pc |
+| Target Platform | PC |
 | Resolution | 1980x1080 |
 | Build Type | Windows x64 |
 
@@ -71,8 +71,8 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 |---|---|
 | **Video Title** | Daisy Dash: Tutorial and Gameplay Walkthrough |
 | **Link / Embed** | [Watch the gameplay walkthrough](docs/videos/Game%20playthrough.mp4) |
-| **Duration** | To be recorded |
-| **Description** | This walkthrough begins at the main menu and demonstrates the tutorial level, including movement, jumping, flashlight-revealed blocks, wall sliding, wall jumping, dashing, one way platforms, and the pause menu. It also shows the hazard and respawn system before finishing the tutorial by reaching the green triangle. |
+| **Duration** | 1:38 |
+| **Description** | This walkthrough begins at the main menu and demonstrates the tutorial level, including movement, jumping, flashlight-revealed blocks, wall sliding, wall jumping, dashing, one-way platforms, and the pause menu. It also shows the hazard and respawn system before finishing the tutorial by reaching the green triangle. |
 
 ### 2.2 Feature Highlight Clips
 
@@ -89,7 +89,7 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 ### 3.1 Core Mechanics
 | ID | Mechanic | Description | Implemented In (Script/Object) |
 |---|---|---|---|
-| M-1 | Player movement | Allows the player to move throughout the level. | `PlayerMovement.cs` |
+| M-1 | Player movement | Controls running, jumping, wall movement, and dashing through each level. | `PlayerMovement.cs` |
 | M-2 | Flashlight | The flashlight can reveal hidden blocks and paths | `FlashlightControls.cs` & `FlashlightReveal.cs` |
 | M-3 | Checkpoints system | Automatically puts a player back at their last checkpoint after dying. | `Checkpoint.cs`|
 | M-4 | Level timer | Starts a timer when starting a level and stops timer at end | `TimerManager.cs` |
@@ -131,7 +131,7 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 |---|---|
 | Scoring System | No points are awarded and the timer measures the player’s performance. |
 | Difficulty Progression | Each level becomes progressively more difficult. |
-| Unlockables / Levels | Completing a level unlocks and loads the next level. |
+| Unlockables / Levels | No unlock system is currently implemented. Completing a level loads the next scene when another level is available. |
 
 ---
 
@@ -339,12 +339,15 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 ### 10.4 Unity Packages & Plugins
 | Package Name | Version | Source | Licence | URL | Purpose |
 |---|---|---|---|---|---|
-| None  | N/A | N/A | N/A | N/A | N/A |
+| Cinemachine | 3.1.7 | Unity Technologies | Unity Companion License | https://docs.unity3d.com/Packages/com.unity.cinemachine@3.1/manual/index.html | Camera tools |
+| Input System | 1.14.2 | Unity Technologies | Unity Companion License | https://docs.unity3d.com/Packages/com.unity.inputsystem@1.14/manual/index.html | Input actions and controls |
+| Universal Render Pipeline | 17.0.4 | Unity Technologies | Unity Companion License | https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@17.0/manual/index.html | 2D rendering and lighting |
+| Unity UI | 2.0.0 | Unity Technologies | Unity Companion License | https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/index.html | Menus and interface elements |
 
 ### 10.5 Fonts
 | Font Name | Creator / Source | Licence | URL |
 |---|---|---|---|
-| None  | N/A | N/A | N/A |
+| TextMesh Pro default resources | Unity Technologies | Unity Companion License | https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.0/manual/index.html |
 
 ---
 
@@ -371,8 +374,8 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 |---|---|
 | **Branch Name** | `main` |
 | **Purpose** | Stable, releasable version of the game |
-| **Merged From** | |
-| **Final Commit** | |
+| **Merged From** | N/A |
+| **Final Commit** | N/A |
 
 ---
 
@@ -380,19 +383,19 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 | Field | Detail |
 |---|---|
-| **Branch Name** | Camera |
-| **Feature Developed** | Camera |
-| **Merged Into** | Main |
-| **Date Started** | 2026-06-18 |
-| **Date Merged** | 2026-06-25 |
+| **Branch Name** | `origin/Camera` |
+| **Feature Developed** | Camera movement and lighting |
+| **Merged Into** | `main` |
+| **Date Started** | 2025-03-05 |
+| **Date Merged** | 2026-06-11 |
 
 #### What Was Built
-<!-- Describe what this branch added or changed -->
+Added camera movement and lighting.
 
 #### Key Commits
 | Commit Message | What Changed |
 |---|---|
-| | |
+| `Added camera movement lighting` | Final branch commit on 2026-06-11. |
 | | |
 | | |
 
@@ -412,30 +415,30 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 | Field | Detail |
 |---|---|
-| **Branch Name** | |
-| **Feature Developed** | |
-| **Merged Into** | |
-| **Date Started** | |
-| **Date Merged** | |
+| **Branch Name** | `origin/Levels` |
+| **Feature Developed** | Level development |
+| **Merged Into** | `main` |
+| **Date Started** | 2025-03-05 |
+| **Date Merged** | 2026-08-24 |
 
 #### What Was Built
+Developed the level layout, with further level work still in progress.
 
 
 #### Key Commits
 | Commit Message | What Changed |
 |---|---|
-| | |
+| `Wip levels` | Final branch commit on 2026-08-24. |
 | | |
 | | |
 
 #### Problems Encountered & Resolved
 | Problem | Resolution |
 |---|---|
-| | |
-| | |
+|  | |
 
 #### Screenshot / Evidence
-> `![Feature Name](./docs/screenshots/branch_feature_name.png)`
+> [View Level 1 screenshot](docs/screenshots/level%201.png)
 
 ---
 
@@ -443,30 +446,31 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 | Field | Detail |
 |---|---|
-| **Branch Name** | |
-| **Feature Developed** | |
-| **Merged Into** | |
-| **Date Started** | |
-| **Date Merged** | |
+| **Branch Name** | `origin/animations` |
+| **Feature Developed** | Animations |
+| **Merged Into** | `main` |
+| **Date Started** | 2025-03-05 |
+| **Date Merged** | 2026-06-18 |
 
 #### What Was Built
+Developed the player idle animation, with further animation work still in progress.
 
 
 #### Key Commits
 | Commit Message | What Changed |
 |---|---|
-| | |
+| `Wip animations` | Final branch commit on 2026-06-18. |
 | | |
 | | |
 
 #### Problems Encountered & Resolved
 | Problem | Resolution |
 |---|---|
-| | |
+| N/A | N/A |
 | | |
 
 #### Screenshot / Evidence
-> `![Feature Name](./docs/screenshots/branch_feature_name.png)`
+> [View idle animation screenshot](docs/screenshots/player%20idle.png)
 
 ---
 
@@ -474,30 +478,31 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 | Field | Detail |
 |---|---|
-| **Branch Name** | |
-| **Feature Developed** | |
-| **Merged Into** | |
-| **Date Started** | |
-| **Date Merged** | |
+| **Branch Name** | `origin/lighting` |
+| **Feature Developed** | Lighting |
+| **Merged Into** | `main` |
+| **Date Started** | 2025-03-05 |
+| **Date Merged** | 2026-06-17 |
 
 #### What Was Built
+Switched to a spot light to improve the flashlight effect and level visibility.
 
 
 #### Key Commits
 | Commit Message | What Changed |
 |---|---|
-| | |
+| `Fixed lighting` | Final branch commit on 2026-06-17. |
 | | |
 | | |
 
 #### Problems Encountered & Resolved
 | Problem | Resolution |
 |---|---|
-| | |
+| The original lighting setup did not illuminate the level correctly. | Switched to a spot light to improve the lighting and flashlight effect. |
 | | |
 
 #### Screenshot / Evidence
-> `![Feature Name](./docs/screenshots/branch_feature_name.png)`
+> [View lighting screenshot](docs/screenshots/flashlight.png)
 
 ---
 
@@ -505,19 +510,20 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 | Field | Detail |
 |---|---|
-| **Branch Name** | |
-| **Feature Developed** | |
-| **Merged Into** | |
-| **Date Started** | |
-| **Date Merged** | |
+| **Branch Name** | `origin/movement` |
+| **Feature Developed** | Level and player movement development |
+| **Merged Into** | `main` |
+| **Date Started** | 2025-03-05 |
+| **Date Merged** | 2026-08-10 |
 
 #### What Was Built
+Continued work on the level layout and player movement systems.
 
 
 #### Key Commits
 | Commit Message | What Changed |
 |---|---|
-| | |
+| `MAde level` | Final branch commit on 2026-08-10. |
 | | |
 | | |
 
@@ -528,7 +534,7 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 | | |
 
 #### Screenshot / Evidence
-> `![Feature Name](./docs/screenshots/branch_feature_name.png)`
+> [View Level 1 screenshot](docs/screenshots/level%201.png)
 
 ---
 
@@ -538,12 +544,12 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 
 | Branch Name | Feature | Date Started | Date Merged | Status |
 |---|---|---|---|---|
-| `main` | Stable release | | | |
-| `feature/Camera` |  |  |  |  |
-| `feature/Levels` |  |  |  |  |
-| `feature/animations` |  |  |  |  |
-| `feature/lighting` |  |  |  |  |
-| `feature/movement` |  |  |  |  |
+| `main` | Stable release | N/A | Not applicable | Active |
+| `origin/Camera` | Camera movement and lighting | 2025-03-05 | 2026-06-11 | Merged into main |
+| `origin/Levels` | Level development | 2025-03-05 | 2026-08-24 | Merged into main |
+| `origin/animations` | Animations | 2025-03-05 | 2026-06-18 | Merged into main |
+| `origin/lighting` | Lighting | 2025-03-05 | 2026-06-17 | Merged into main |
+| `origin/movement` | Level and movement development | 2025-03-05 | 2026-08-10 | Merged into main |
 
 ---
 
