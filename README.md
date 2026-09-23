@@ -386,7 +386,7 @@ Daisy Dash is a 2D platformer in which the player navigates platforming levels u
 | **Branch Name** | `origin/Camera` |
 | **Feature Developed** | Camera movement and lighting |
 | **Merged Into** | `main` |
-| **Date Started** | 2025-03-05 |
+| **Date Started** | Unknown |
 | **Date Merged** | 2026-06-11 |
 
 #### What Was Built
@@ -418,7 +418,7 @@ Added camera movement and lighting.
 | **Branch Name** | `origin/Levels` |
 | **Feature Developed** | Level development |
 | **Merged Into** | `main` |
-| **Date Started** | 2025-03-05 |
+| **Date Started** | Unknown |
 | **Date Merged** | 2026-08-24 |
 
 #### What Was Built
@@ -449,7 +449,7 @@ Developed the level layout, with further level work still in progress.
 | **Branch Name** | `origin/animations` |
 | **Feature Developed** | Animations |
 | **Merged Into** | `main` |
-| **Date Started** | 2025-03-05 |
+| **Date Started** | Unknown |
 | **Date Merged** | 2026-06-18 |
 
 #### What Was Built
@@ -481,7 +481,7 @@ Developed the player idle animation, with further animation work still in progre
 | **Branch Name** | `origin/lighting` |
 | **Feature Developed** | Lighting |
 | **Merged Into** | `main` |
-| **Date Started** | 2025-03-05 |
+| **Date Started** | Unknown |
 | **Date Merged** | 2026-06-17 |
 
 #### What Was Built
@@ -513,7 +513,7 @@ Switched to a spot light to improve the flashlight effect and level visibility.
 | **Branch Name** | `origin/movement` |
 | **Feature Developed** | Level and player movement development |
 | **Merged Into** | `main` |
-| **Date Started** | 2025-03-05 |
+| **Date Started** | Unknown |
 | **Date Merged** | 2026-08-10 |
 
 #### What Was Built
@@ -545,11 +545,11 @@ Continued work on the level layout and player movement systems.
 | Branch Name | Feature | Date Started | Date Merged | Status |
 |---|---|---|---|---|
 | `main` | Stable release | N/A | Not applicable | Active |
-| `origin/Camera` | Camera movement and lighting | 2025-03-05 | 2026-06-11 | Merged into main |
-| `origin/Levels` | Level development | 2025-03-05 | 2026-08-24 | Merged into main |
-| `origin/animations` | Animations | 2025-03-05 | 2026-06-18 | Merged into main |
-| `origin/lighting` | Lighting | 2025-03-05 | 2026-06-17 | Merged into main |
-| `origin/movement` | Level and movement development | 2025-03-05 | 2026-08-10 | Merged into main |
+| `origin/Camera` | Camera movement and lighting | Unknown | 2026-06-11 | Merged into main |
+| `origin/Levels` | Level development | Unknown | 2026-08-24 | Merged into main |
+| `origin/animations` | Animations | Unknown | 2026-06-18 | Merged into main |
+| `origin/lighting` | Lighting | Unknown | 2026-06-17 | Merged into main |
+| `origin/movement` | Level and movement development | Unknown | 2026-08-10 | Merged into main |
 
 ---
 
