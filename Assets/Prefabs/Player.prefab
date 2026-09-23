@@ -5333,13 +5333,17 @@ MonoBehaviour:
   climbableWallLayer:
     serializedVersion: 2
     m_Bits: 8
-  climbKey: 99
-  climbSpeed: 5
   dashSpeed: 18
   dashDuration: 0.2
   dashEndSpeedMultiplier: 0.7
   dashResetDelay: 0.05
   dashKey: 304
+  jumpVfx: {fileID: 0}
+  jumpSounds:
+  - {fileID: 8300000, guid: 88d4b1b1c2f8b7e4a986c7fbdb8b175a, type: 3}
+  - {fileID: 8300000, guid: 81f1a5715798e7749bc27122fd84c49a, type: 3}
+  - {fileID: 8300000, guid: dafca9320cf0a0845a5e6ca9f3a4a983, type: 3}
+  dashSound: {fileID: 8300000, guid: 08f36bca668d7784090f9b7eafb3b950, type: 3}
 --- !u!95 &1552089866951750126
 Animator:
   serializedVersion: 7
@@ -5420,3 +5424,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f538489af28fdc4982ae1a23e9646e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deathSound: {fileID: 8300000, guid: 7ee7ed70de4bb264e929a8f0db37fe94, type: 3}

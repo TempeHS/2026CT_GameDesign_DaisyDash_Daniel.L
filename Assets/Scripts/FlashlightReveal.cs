@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -15,10 +16,13 @@ public class FlashlightReveal : MonoBehaviour
     [Header("Collision")]
     [SerializeField] private bool toggleCollision = true;
     [SerializeField] private bool includeChildColliders = true;
+    [SerializeField] private float minimumOverlapDepth = 0.05f;
 
     private Renderer[] targetRenderers;
     private Collider2D[] colliders2D;
+    private readonly List<Collider2D> overlapResults = new List<Collider2D>();
     private bool isRevealed;
+    private bool hasRespawnedPlayer;
 
     void Awake()
     {
@@ -92,6 +96,8 @@ public class FlashlightReveal : MonoBehaviour
     private void SetRevealed(bool revealed)
     {
         isRevealed = revealed;
+        if (!revealed)
+            hasRespawnedPlayer = false;
 
         for (int i = 0; i < targetRenderers.Length; i++)
             targetRenderers[i].enabled = revealed;
@@ -100,6 +106,43 @@ public class FlashlightReveal : MonoBehaviour
 
         for (int i = 0; i < colliders2D.Length; i++)
             colliders2D[i].enabled = revealed;
+
+        if (revealed)
+            RespawnPlayerIfInside();
+    }
+
+    private void RespawnPlayerIfInside()
+    {
+        if (hasRespawnedPlayer)
+            return;
+
+        Physics2D.SyncTransforms();
+        ContactFilter2D contactFilter = new ContactFilter2D();
+        contactFilter.NoFilter();
+
+        for (int i = 0; i < colliders2D.Length; i++)
+        {
+            if (!colliders2D[i].enabled)
+                continue;
+
+            overlapResults.Clear();
+            Physics2D.OverlapCollider(colliders2D[i], contactFilter, overlapResults);
+
+            for (int j = 0; j < overlapResults.Count; j++)
+            {
+                ColliderDistance2D distance = Physics2D.Distance(colliders2D[i], overlapResults[j]);
+                if (!distance.isOverlapped || distance.distance > -minimumOverlapDepth)
+                    continue;
+
+                RespawnManager respawn = overlapResults[j].GetComponentInParent<RespawnManager>();
+                if (respawn == null || !respawn.CompareTag("Player"))
+                    continue;
+
+                hasRespawnedPlayer = true;
+                respawn.Respawn();
+                return;
+            }
+        }
     }
 
 }

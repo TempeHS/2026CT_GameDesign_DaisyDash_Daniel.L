@@ -29,10 +29,6 @@ public class PlayerMovement : MonoBehaviour
     public float wallJumpControlTime = 0.15f; 
     public LayerMask climbableWallLayer; 
 
-    [Header("Climbing Settings")]
-    public KeyCode climbKey = KeyCode.C;  
-    public float climbSpeed = 5f;          
-
     [Header("Dash Settings")]
     public float dashSpeed = 28f;          
     public float dashDuration = 0.15f;     
@@ -44,14 +40,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private ParticleSystem jumpVfx;
 
     [Header("Audio")]
-    [SerializeField] private AudioSource jumpAudioSource;
-    [SerializeField] private AudioClip jumpSound;
+    [SerializeField] private AudioClip[] jumpSounds;
+    [SerializeField] private AudioClip dashSound;
 
     private Rigidbody2D rb;
     private float moveInputX;
     private float moveInputY;
     private bool isWallSliding;
-    private bool isClimbing;               
     private float coyoteCounter;
     private float jumpBufferCounter;
     
@@ -64,6 +59,7 @@ public class PlayerMovement : MonoBehaviour
     private float originalGravity;
     private float dashResetTimestamp;
     private float wallJumpTimer;
+    private float wallJumpDirection;
 
     private bool IsGrounded => _isGroundedNow;
     private bool IsTouchingWall => wallContacts.Count > 0;
@@ -116,27 +112,19 @@ public class PlayerMovement : MonoBehaviour
             coyoteCounter = 0f;
         }
 
-        isClimbing = IsTouchingWall && (Input.GetKey(climbKey) || Input.GetKey(KeyCode.Z));
-        isWallSliding = !IsGrounded && IsTouchingWall && !isClimbing && moveInputX != 0 && rb.linearVelocity.y < 0;
+        isWallSliding = !IsGrounded && IsTouchingWall && rb.linearVelocity.y < 0;
 
         if (Input.GetKeyDown(dashKey) && canDash)
             StartCoroutine(PerformDash());
 
         if (jumpBufferCounter <= 0) return;
-        if (coyoteCounter > 0) Jump();
-        else if (isWallSliding || isClimbing) WallJump();
+        if (IsTouchingWall && !IsGrounded) WallJump();
+        else if (coyoteCounter > 0) Jump();
     }
 
     void FixedUpdate()
     {
         if (isDashing) return;
-
-        if (isClimbing)
-        {
-            rb.gravityScale = 0f; 
-            rb.linearVelocity = new Vector2(0f, moveInputY * climbSpeed);
-            return;
-        }
 
         rb.gravityScale = originalGravity;
 
@@ -148,7 +136,6 @@ public class PlayerMovement : MonoBehaviour
         if (isWallSliding)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, wallSlideSpeed);
-            return; 
         }
 
         if (IsWallJumpLocked) return;
@@ -192,12 +179,9 @@ public class PlayerMovement : MonoBehaviour
 
     void WallJump()
     {
-        float pushDir = -Mathf.Sign(moveInputX); 
-        
-        if (moveInputX == 0)
-        {
+        float pushDir = wallJumpDirection;
+        if (pushDir == 0f)
             pushDir = transform.localScale.x > 0 ? -1f : 1f;
-        }
 
         rb.linearVelocity = new Vector2(pushDir * wallJumpForceX, wallJumpForceY);
 
@@ -214,14 +198,23 @@ public class PlayerMovement : MonoBehaviour
         if (jumpVfx != null)
             jumpVfx.Play(true);
 
-        if (jumpAudioSource != null && jumpSound != null)
-            jumpAudioSource.PlayOneShot(jumpSound);
+        if (jumpSounds == null || jumpSounds.Length == 0)
+            return;
+
+        AudioClip soundToPlay = jumpSounds[Random.Range(0, jumpSounds.Length)];
+        if (soundToPlay == null)
+            return;
+
+        AudioSource.PlayClipAtPoint(soundToPlay, transform.position);
     }
 
     private IEnumerator PerformDash()
     {
         canDash = false; 
         isDashing = true;
+
+        if (dashSound != null)
+            AudioSource.PlayClipAtPoint(dashSound, transform.position);
 
         rb.gravityScale = 0f;
 
@@ -287,6 +280,7 @@ public class PlayerMovement : MonoBehaviour
                 if ((climbableWallLayer.value & (1 << collision.gameObject.layer)) != 0)
                 {
                     hasWallContact = true;
+                    wallJumpDirection = Mathf.Sign(normal.x);
                 }
             }
         }
