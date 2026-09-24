@@ -511,7 +511,7 @@ Switched to a spot light to improve the flashlight effect and level visibility.
 | Field | Detail |
 |---|---|
 | **Branch Name** | `origin/movement` |
-| **Feature Developed** | Level and player movement development |
+| **Feature Developed** | Player movement and level (accidentally commited) development |
 | **Merged Into** | `main` |
 | **Date Started** | Unknown |
 | **Date Merged** | 2026-08-10 |
