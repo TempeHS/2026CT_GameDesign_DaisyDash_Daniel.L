@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HoldToRestartBar : MonoBehaviour
+public class Restart : MonoBehaviour
 {
     [Header("Input")]
     [SerializeField] private KeyCode restartKey = KeyCode.R;
